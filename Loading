@@ -1,0 +1,8 @@
+-- Этот код загружает ваш основной чит-скрипт jypx-hub
+local success, err = pcall(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/LimeCVC/jypx-hub/refs/heads/main/main.lua'))()
+end)
+
+if not success then
+    warn("[Main Script Error]: " .. tostring(err))
+end
