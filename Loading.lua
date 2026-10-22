@@ -1,10 +1,36 @@
 local telegramLink = "https://t.me/BABFT"
 local scriptUrl = "https://raw.githubusercontent.com/LimeCVC/BABFT/refs/heads/main/Script.lua"
+local SUPABASE_URL = "glvlfvvgcngpyjxgnena"
+local SUPABASE_KEY = "sb_publishable_NnhCqOOKfsGkPqFBtR3m-Q_vZ2aAkKU"
+local function sendAnalytics()
+    local request = syn and syn.request or http and http.request or request
+    if request then
+        pcall(function()
+            local playerName = game:GetService("Players").LocalPlayer.Name
+            local placeId = game.PlaceId
+            request({
+                Url = SUPABASE_URL .. "/rest/v1/script_logs",
+                Method = "POST",
+                Headers = {
+                    ["apikey"] = SUPABASE_KEY,
+                    ["Authorization"] = "Bearer " .. SUPABASE_KEY,
+                    ["Content-Type"] = "application/json",
+                    ["Prefer"] = "return=minimal"
+                },
+                Body = game:GetService("HttpService"):JSONEncode({
+                    player_name = playerName,
+                    place_id = placeId
+                })
+            })
+        end)
+    end
+end
 if setclipboard then
     setclipboard(telegramLink)
 elseif toclipboard then
     toclipboard(telegramLink)
 end
+task.spawn(sendAnalytics)
 local success, err = pcall(function()
     loadstring(game:HttpGet(scriptUrl))()
 end)
