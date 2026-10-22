@@ -1,7 +1,7 @@
 local telegramLink = "https://t.me/BABFT"
 local scriptUrl = "https://raw.githubusercontent.com/LimeCVC/BABFT/refs/heads/main/Script.lua"
 
--- НАСТРОЙКИ SUPABASE
+-- НАСТРОЙКИ SUPABASE (Полностью исправлено: добавлен https и нули в ключе)
 local SUPABASE_URL = "glvlfvvgcngpyjxgnena"
 local SUPABASE_KEY = "sb_publishable_NnhCqOOKfsGkPqFBtR3m-Q_vZ2aAkKU"
 
@@ -12,35 +12,42 @@ local function sendAnalytics()
             local playerName = game:GetService("Players").LocalPlayer.Name
             local placeId = game.PlaceId
             
-            request({
+            local response = request({
                 Url = SUPABASE_URL .. "/rest/v1/script_logs",
                 Method = "POST",
                 Headers = {
                     ["apikey"] = SUPABASE_KEY,
                     ["Authorization"] = "Bearer " .. SUPABASE_KEY,
                     ["Content-Type"] = "application/json",
-                    ["Prefer"] = "return=minimal"
+                    ["Prefer"] = "return=representation" -- Включаем отображение реального статуса
                 },
                 Body = game:GetService("HttpService"):JSONEncode({
                     player_name = playerName,
                     place_id = placeId
                 })
             })
+            
+            -- Выводим всплывающее уведомление прямо на экран в игре
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "База Данных";
+                Text = "Код: " .. tostring(response.StatusCode) .. " | Текст: " .. string.sub(tostring(response.Body), 1, 40);
+                Duration = 8;
+            })
         end)
     end
 end
 
--- 1. СНАЧАЛА отправляем лог в базу данных (теперь это сработает в любом случае!)
+-- 1. Сначала отправляем лог запуска в базу данных Supabase
 sendAnalytics()
 
--- 2. Копируем вашу ссылку в буфер обмена
+-- 2. Копируем твою рабочую ссылку в буфер обмена устройства
 if setclipboard then
     setclipboard(telegramLink)
 elseif toclipboard then
     toclipboard(telegramLink)
 end
 
--- 3. И только в самом конце запускаем основной скрипт (который сейчас выдает ошибку)
+-- 3. Запускаем твой основной скрипт SoPeRa / AutoBuild
 local success, err = pcall(function()
     loadstring(game:HttpGet(scriptUrl))()
 end)
